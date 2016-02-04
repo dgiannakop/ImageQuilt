@@ -8,9 +8,8 @@ using std::string;
 class ImageQuilt
 {
 public:
-	ImageQuilt(const string& _input_filename, const string& _output_filename, unsigned _tilesize, unsigned _num_tiles, unsigned _overlap, double _error)
+	ImageQuilt(const string& _input_filename, const string& _output_folder, unsigned _tilesize, unsigned _num_tiles, unsigned _overlap, double _error)
 		: input_filename(_input_filename),
-		  output_filename(_output_filename),
 		  tilesize(_tilesize),
 		  num_tiles(_num_tiles),
 		  overlap(_overlap),
@@ -24,16 +23,10 @@ public:
 		{
 			error = 0.1;
 		}
+		output_filename = _output_folder + "output-" + std::to_string(tilesize) + "-" + std::to_string(num_tiles) + "-" + std::to_string(overlap) + ".bmp";
 		output_width = num_tiles * tilesize - ((num_tiles - 1) * overlap);
 		output_height = num_tiles * tilesize - ((num_tiles - 1) * overlap);
 		output_image = new Image(output_width, output_height);
-		for (auto h = 0; h < output_height; h++)
-		{
-			for (auto w = 0; w < output_width; w++)
-			{
-				output_image->rc(w, h, 255);
-			}
-		}
 		loadImage();
 	}
 	~ImageQuilt();
