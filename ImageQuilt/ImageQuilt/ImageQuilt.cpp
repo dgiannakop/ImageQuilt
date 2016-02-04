@@ -35,9 +35,6 @@ void ImageQuilt::synthesize()
 		col = 0;
 	}
 
-	unsigned int* last_point = new unsigned int[2]; //width, height
-	last_point[0] = tilesize - overlap;
-	last_point[1] = 0;
 	// total number of tiles to place
 	unsigned int total_tiles = num_tiles * num_tiles;
 	// start placing them from left to right, top to bottom
@@ -154,7 +151,6 @@ void ImageQuilt::synthesize()
 	// cleanup
 	delete input_image;
 	delete output_image;
-	delete last_point;
 }
 
 Image* ImageQuilt::get_output() const
