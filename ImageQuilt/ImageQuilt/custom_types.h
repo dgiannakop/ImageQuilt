@@ -3,22 +3,65 @@
 #include <string>
 #include <stdint.h>
 
+
 class Image {
 public:
+	typedef double precision;
+
 	unsigned int width;
 	unsigned int height;
 	uint8_t* data;
+	precision* hsv_data;
+	precision* xyz_data;
+	precision* cielab_data;
 
 	Image(unsigned int _w, unsigned int _h);
 	Image(unsigned int _w, unsigned int _h, uint8_t* _data) : width(_w), height(_h), data(_data) {}
 	~Image();
+	void rgb2hsv();
+	static void rgb2hsv(precision r, precision g, precision b, precision* h, precision* s, precision* v);
+	void hsv2rgb();
+	static void hsv2rgb(precision *r, precision *g, precision *b, precision h, precision s, precision v);
+	void rgb2xyz();
+	static void rgb2xyz(precision r, precision g, precision b, precision* x, precision* y, precision* z);
+	void xyz2rgb();
+	static void xyz2rgb(precision* r, precision* g, precision* b, precision x, precision y, precision z);
+	void xyz2cielab();
+	static void xyz2cielab(precision x, precision y, precision z, precision* l, precision* a, precision* b);
+	void cielab2xyz();
+	static void cielab2xyz(precision* x, precision* y, precision* z, precision l, precision a, precision b);
+
 	uint8_t rc(unsigned int w, unsigned int h) const;
 	uint8_t gc(unsigned int w, unsigned int h) const;
 	uint8_t bc(unsigned int w, unsigned int h) const;
 
+	precision h(unsigned int w, unsigned int h) const;
+	precision s(unsigned int w, unsigned int h) const;
+	precision v(unsigned int w, unsigned int h) const;
+
+	precision x(unsigned int w, unsigned int h) const;
+	precision y(unsigned int w, unsigned int h) const;
+	precision z(unsigned int w, unsigned int h) const;
+
+	precision l(unsigned int w, unsigned int h) const;
+	precision a(unsigned int w, unsigned int h) const;
+	precision b(unsigned int w, unsigned int h) const;
+
 	void rc(unsigned int w, unsigned int h, uint8_t value);
 	void gc(unsigned int w, unsigned int h, uint8_t value);
 	void bc(unsigned int w, unsigned int h, uint8_t value);
+
+	void h(unsigned int w, unsigned int h, precision value);
+	void s(unsigned int w, unsigned int h, precision value);
+	void v(unsigned int w, unsigned int h, precision value);
+
+	void x(unsigned int w, unsigned int h, precision value);
+	void y(unsigned int w, unsigned int h, precision value);
+	void z(unsigned int w, unsigned int h, precision value);
+
+	void l(unsigned int w, unsigned int h, precision value);
+	void a(unsigned int w, unsigned int h, precision value);
+	void b(unsigned int w, unsigned int h, precision value);
 };
 
 class Texture {
@@ -60,7 +103,7 @@ public:
 				image->rc(w, h, source->rc(wLocation + w, hLocation + h));
 				image->gc(w, h, source->gc(wLocation + w, hLocation + h));
 				image->bc(w, h, source->bc(wLocation + w, hLocation + h));
-			}			
+			}
 		}
 	}
 	~Patch()
