@@ -332,6 +332,17 @@ void Image::cielab2xyz(precision* x, precision* y, precision* z, precision l, pr
 	*z = ref_Z * (*z);    //ref_Z = 108.883
 }
 
+void Image::rgb2cielab()
+{
+	this->rgb2xyz();
+	this->xyz2cielab();
+}
+void Image::cielab2rgb()
+{
+	this->cielab2xyz();
+	this->xyz2rgb();
+}
+
 uint8_t Image::rc(unsigned int w, unsigned int h) const
 {
 	return data[3 * width * h + 3 * w];

@@ -30,7 +30,8 @@ public:
 	static void xyz2cielab(precision x, precision y, precision z, precision* l, precision* a, precision* b);
 	void cielab2xyz();
 	static void cielab2xyz(precision* x, precision* y, precision* z, precision l, precision a, precision b);
-
+	void rgb2cielab();
+	void cielab2rgb();
 	//TODO:
 	void upscale(int times);
 	void downscale(int times);
