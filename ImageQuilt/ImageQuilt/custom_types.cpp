@@ -15,12 +15,9 @@ Image::Image(unsigned int _w, unsigned int _h)
 Image::~Image()
 {
 	delete data;
-	if(hsv_data)
-		delete hsv_data;
-	if (xyz_data)
-		delete xyz_data;
-	if (cielab_data)
-		delete cielab_data;
+	delete hsv_data;
+	delete xyz_data;
+	delete cielab_data;
 }
 
 void Image::rgb2hsv()
@@ -148,9 +145,9 @@ void Image::rgb2xyz()
 	{
 		for (unsigned int w = 0; w < width; w++)
 		{
-			auto rc = static_cast<precision>(this->rc(w, h)) / 255;
-			auto gc = static_cast<precision>(this->gc(w, h)) / 255;
-			auto bc = static_cast<precision>(this->bc(w, h)) / 255;
+			auto rc = this->rc(w, h);
+			auto gc = this->gc(w, h);
+			auto bc = this->bc(w, h);
 			precision x, y, z;
 			rgb2xyz(rc, gc, bc, &x, &y, &z);
 			this->x(w, h, x);
@@ -161,6 +158,9 @@ void Image::rgb2xyz()
 }
 void Image::rgb2xyz(precision r, precision g, precision b, precision* x, precision* y, precision* z)
 {
+	r = r / 255.0;
+	g = g / 255.0;
+	b = b / 255.0;
 	if (r > 0.04045f) {
 		r = powf(((r + 0.055f) / 1.055f), 2.4f);
 	}
@@ -203,9 +203,9 @@ void Image::xyz2rgb()
 			auto z = this->z(w, h);
 			precision rc, gc, bc;
 			xyz2rgb(&rc, &gc, &bc, x, y, z);
-			this->rc(w, h, static_cast<uint8_t>(round(rc * 255)));
-			this->gc(w, h, static_cast<uint8_t>(round(gc * 255)));
-			this->bc(w, h, static_cast<uint8_t>(round(bc * 255)));
+			this->rc(w, h, static_cast<uint8_t>(rc));
+			this->gc(w, h, static_cast<uint8_t>(gc));
+			this->bc(w, h, static_cast<uint8_t>(bc));
 		}
 	}
 }
@@ -231,6 +231,10 @@ void Image::xyz2rgb(precision* r, precision* g, precision* b, precision x, preci
 		*b = 1.055 * (powf(*b, (1 / 2.4))) - 0.055;
 	else
 		*b = 12.92 * (*b);
+
+	*r = round(*r * 255);
+	*g = round(*g * 255);
+	*b = round(*b * 255);
 }
 
 void Image::xyz2cielab()
@@ -298,29 +302,30 @@ void Image::cielab2xyz()
 		}
 	}
 }
-
 void Image::cielab2xyz(precision* x, precision* y, precision* z, precision l, precision a, precision b)
 {
 	precision ref_X = 95.047;
 	precision ref_Y = 100.000;
 	precision ref_Z = 108.883;
+	double e = 0.008856;
+	double k = 903.3;
 
 	*y = (l + 16) / 116.0;
-	*x = a / 500 + *y;
-	*z = *y - b / 200;
+	*x = a / 500 + (*y);
+	*z = (*y) - b / 200;
 
-	if (powf(*y, 3) > 0.008856)
+	if (powf(*y, 3) > e)
 		*y = powf(*y, 3);
 	else
-		*y = (*y - 16 / 116) / 7.787;
-	if (powf(*x, 3) > 0.008856)
+		*y = ((*y) * 116 - 16) / k;
+	if (powf(*x, 3) > e)
 		*x = powf(*x, 3);
 	else
-		*x = (*x - 16 / 116) / 7.787;
-	if (powf(*z, 3) > 0.008856)
+		*x = ((*x)*116 - 16) / k;
+	if (powf(*z, 3) > e)
 		*z = powf(*z, 3);
 	else
-		*z = (*z - 16 / 116) / 7.787;
+		*z = ((*z)*116 - 16) / k;
 
 	*x = ref_X * (*x);     //ref_X =  95.047     Observer= 2°, Illuminant= D65
 	*y = ref_Y * (*y);     //ref_Y = 100.000

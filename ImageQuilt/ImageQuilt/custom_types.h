@@ -31,6 +31,10 @@ public:
 	void cielab2xyz();
 	static void cielab2xyz(precision* x, precision* y, precision* z, precision l, precision a, precision b);
 
+	//TODO:
+	void upscale(int times);
+	void downscale(int times);
+
 	uint8_t rc(unsigned int w, unsigned int h) const;
 	uint8_t gc(unsigned int w, unsigned int h) const;
 	uint8_t bc(unsigned int w, unsigned int h) const;
@@ -64,41 +68,19 @@ public:
 	void b(unsigned int w, unsigned int h, precision value);
 };
 
-class Texture {
-public:
-	uint8_t* rc;
-	uint8_t* gc;
-	uint8_t* bc;
-	unsigned int width;
-	unsigned int height;
-
-	Texture(unsigned int w, unsigned int h) {
-		rc = new uint8_t[w*h];
-		gc = new uint8_t[w*h];
-		bc = new uint8_t[w*h];
-		width = w;
-		height = h;
-	}
-	~Texture() {
-		delete rc;
-		delete gc;
-		delete bc;
-	}
-};
-
 class Patch {
 public:
 	unsigned int wLocation;
 	unsigned int hLocation;
-	unsigned int tilesize;
+	unsigned int tilesize_w, tilesize_h;
 	double error;
 	Image* image;
-	Patch(unsigned int _w, unsigned int _h, unsigned int _tilesize, Image* source) : wLocation(_w), hLocation(_h), tilesize(_tilesize), error(DBL_MAX)
+	Patch(unsigned int _w, unsigned int _h, unsigned int _tilesize_w, unsigned int _tilesize_h, Image* source) : wLocation(_w), hLocation(_h), tilesize_w(_tilesize_w), tilesize_h(_tilesize_h), error(DBL_MAX)
 	{
-		image = new Image(tilesize, tilesize);
-		for (auto h = 0; h < tilesize; h++)
+		image = new Image(tilesize_w, tilesize_h);
+		for (auto h = 0; h < tilesize_h; h++)
 		{
-			for (auto w = 0; w < tilesize; w++)
+			for (auto w = 0; w < tilesize_w; w++)
 			{
 				image->rc(w, h, source->rc(wLocation + w, hLocation + h));
 				image->gc(w, h, source->gc(wLocation + w, hLocation + h));
